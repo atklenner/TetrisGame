@@ -26,13 +26,16 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        tetrisgame.cpp
+        tetrisgame.cpp \
+    tetronimo.cpp \
+    gameboard.cpp
 
 HEADERS += \
-        tetrisgame.h
+        tetrisgame.h \
+    tetronimo.h \
+    gameboard.h
 
-FORMS += \
-        tetrisgame.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
