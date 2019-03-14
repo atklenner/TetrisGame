@@ -22,14 +22,15 @@ private:
     QLabel *createLabel(const QString &text);
 
     //All the elements in the window except the labels.
-    GameBoard *board;
+    GameBoard *gameBoard;
     QLabel *nextPiece;
+    QLabel *holdPiece;
     QLCDNumber *score;
     QLCDNumber *level;
     QLCDNumber *lines;
-    QPushButton *pauseButton;
-    QPushButton *quitButton;
-    QPushButton *startButton;
+    QPushButton *pause;
+    QPushButton *start;
+
 };
 
 #endif // TETRISGAME_H

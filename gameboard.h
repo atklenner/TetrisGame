@@ -17,6 +17,7 @@ public:
     GameBoard(QWidget *parent = 0);
 
     void setNextPieceLabel(QLabel *label);
+    void setHoldPieceLabel(QLabel *label);
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
 
@@ -47,17 +48,21 @@ private:
     void pieceDropped(int dropHeight);
     void removeFullLines();
     void newPiece();
+    void hold();
     void showNextPiece();
+    void showHoldPiece();
     bool tryMove(const Tetronimo &newPiece, int newX, int newY);
     void drawSquare(QPainter &painter, int x, int y, TetronimoShape shape);
 
     QBasicTimer timer;
     QPointer<QLabel> nextPieceLabel;
+    QPointer<QLabel> holdPieceLabel;
     bool isStarted;
     bool isPaused;
     bool isWaitingAfterLine;
     Tetronimo curPiece;
     Tetronimo nextPiece;
+    Tetronimo holdPiece;
     int curX;
     int curY;
     int numLinesRemoved;

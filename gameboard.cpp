@@ -1,9 +1,7 @@
 #include "gameboard.h"
 #include <QtWidgets>
 
-GameBoard::GameBoard(QWidget *parent)
-    : QFrame(parent)
-{
+GameBoard::GameBoard(QWidget *parent) : QFrame(parent) {
     setFrameStyle(QFrame::Panel | QFrame::Sunken);
     setFocusPolicy(Qt::StrongFocus);
     isStarted = false;
@@ -13,25 +11,25 @@ GameBoard::GameBoard(QWidget *parent)
     nextPiece.setRandomShape();
 }
 
-void GameBoard::setNextPieceLabel(QLabel *label)
-{
+void GameBoard::setNextPieceLabel(QLabel *label) {
     nextPieceLabel = label;
 }
 
-QSize GameBoard::sizeHint() const
-{
+void GameBoard::setHoldPieceLabel(QLabel *label) {
+    holdPieceLabel = label;
+}
+
+QSize GameBoard::sizeHint() const {
     return QSize(BoardWidth * 15 + frameWidth() * 2,
                  BoardHeight * 15 + frameWidth() * 2);
 }
 
-QSize GameBoard::minimumSizeHint() const
-{
+QSize GameBoard::minimumSizeHint() const {
     return QSize(BoardWidth * 5 + frameWidth() * 2,
                  BoardHeight * 5 + frameWidth() * 2);
 }
 
-void GameBoard::start()
-{
+void GameBoard::start() {
     if (isPaused)
         return;
 
@@ -51,8 +49,7 @@ void GameBoard::start()
     timer.start(timeoutTime(), this);
 }
 
-void GameBoard::pause()
-{
+void GameBoard::pause() {
     if (!isStarted)
         return;
 
@@ -65,8 +62,7 @@ void GameBoard::pause()
     update();
 }
 
-void GameBoard::paintEvent(QPaintEvent *event)
-{
+void GameBoard::paintEvent(QPaintEvent *event) {
     QFrame::paintEvent(event);
 
     QPainter painter(this);
@@ -98,8 +94,7 @@ void GameBoard::paintEvent(QPaintEvent *event)
     }
 }
 
-void GameBoard::keyPressEvent(QKeyEvent *event)
-{
+void GameBoard::keyPressEvent(QKeyEvent *event) {
     if (!isStarted || isPaused || curPiece.shape() == NoShape) {
         QFrame::keyPressEvent(event);
         return;
@@ -123,13 +118,18 @@ void GameBoard::keyPressEvent(QKeyEvent *event)
     case Qt::Key_D:
         oneLineDown();
         break;
+    case Qt::Key_H:
+        hold();
+        break;
+    case Qt::Key_P:
+        pause();
+        break;
     default:
         QFrame::keyPressEvent(event);
     }
 }
 
-void GameBoard::timerEvent(QTimerEvent *event)
-{
+void GameBoard::timerEvent(QTimerEvent *event) {
     if (event->timerId() == timer.timerId()) {
         if (isWaitingAfterLine) {
             isWaitingAfterLine = false;
@@ -143,14 +143,12 @@ void GameBoard::timerEvent(QTimerEvent *event)
     }
 }
 
-void GameBoard::clearBoard()
-{
+void GameBoard::clearBoard() {
     for (int i = 0; i < BoardHeight * BoardWidth; ++i)
         board[i] = NoShape;
 }
 
-void GameBoard::dropDown()
-{
+void GameBoard::dropDown() {
     int dropHeight = 0;
     int newY = curY;
     while (newY > 0) {
@@ -162,14 +160,12 @@ void GameBoard::dropDown()
     pieceDropped(dropHeight);
 }
 
-void GameBoard::oneLineDown()
-{
+void GameBoard::oneLineDown() {
     if (!tryMove(curPiece, curX, curY - 1))
         pieceDropped(0);
 }
 
-void GameBoard::pieceDropped(int dropHeight)
-{
+void GameBoard::pieceDropped(int dropHeight) {
     for (int i = 0; i < 4; ++i) {
         int x = curX + curPiece.x(i);
         int y = curY - curPiece.y(i);
@@ -191,8 +187,7 @@ void GameBoard::pieceDropped(int dropHeight)
         newPiece();
 }
 
-void GameBoard::removeFullLines()
-{
+void GameBoard::removeFullLines() {
     int numFullLines = 0;
 
     for (int i = BoardHeight - 1; i >= 0; --i) {
@@ -231,8 +226,7 @@ void GameBoard::removeFullLines()
 
 }
 
-void GameBoard::newPiece()
-{
+void GameBoard::newPiece() {
     curPiece = nextPiece;
     nextPiece.setRandomShape();
     showNextPiece();
@@ -246,8 +240,20 @@ void GameBoard::newPiece()
     }
 }
 
-void GameBoard::showNextPiece()
-{
+void GameBoard::hold() {
+    if (holdPiece.shape() == NoShape ) {
+        holdPiece = curPiece;
+        newPiece();
+        showHoldPiece();
+    } else {
+        Tetronimo dummy = curPiece;
+        curPiece = holdPiece;
+        holdPiece = dummy;
+        showHoldPiece();
+    }
+}
+
+void GameBoard::showNextPiece() {
     if (!nextPieceLabel)
         return;
 
@@ -267,8 +273,27 @@ void GameBoard::showNextPiece()
     nextPieceLabel->setPixmap(pixmap);
 }
 
-bool GameBoard::tryMove(const Tetronimo &newPiece, int newX, int newY)
-{
+void GameBoard::showHoldPiece() {
+    if (!holdPieceLabel)
+        return;
+
+    int dx = holdPiece.maxX() - holdPiece.minX() + 1;
+    int dy = holdPiece.maxY() - holdPiece.minY() + 1;
+
+    QPixmap pixmap(dx * squareWidth(), dy * squareHeight());
+    QPainter painter(&pixmap);
+    painter.fillRect(pixmap.rect(), holdPieceLabel->palette().background());
+
+    for (int i = 0; i < 4; ++i) {
+        int x = holdPiece.x(i) - holdPiece.minX();
+        int y = holdPiece.y(i) - holdPiece.minY();
+        drawSquare(painter, x * squareWidth(), y * squareHeight(),
+                   holdPiece.shape());
+    }
+    holdPieceLabel->setPixmap(pixmap);
+}
+
+bool GameBoard::tryMove(const Tetronimo &newPiece, int newX, int newY) {
     for (int i = 0; i < 4; ++i) {
         int x = newX + newPiece.x(i);
         int y = newY - newPiece.y(i);
@@ -285,8 +310,7 @@ bool GameBoard::tryMove(const Tetronimo &newPiece, int newX, int newY)
     return true;
 }
 
-void GameBoard::drawSquare(QPainter &painter, int x, int y, TetronimoShape shape)
-{
+void GameBoard::drawSquare(QPainter &painter, int x, int y, TetronimoShape shape) {
     static const QRgb colorTable[8] = {
         0x000000, 0xCC6666, 0x66CC66, 0x6666CC,
         0xCCCC66, 0xCC66CC, 0x66CCCC, 0xDAAA00

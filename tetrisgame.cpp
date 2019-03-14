@@ -6,12 +6,19 @@
 TetrisGame::TetrisGame() {
 
     //Creating gameboard object, this contains the actual play area.
-    board = new GameBoard;
+    gameBoard = new GameBoard;
 
-    nextPieceLabel = new QLabel;
-    nextPieceLabel->setFrameStyle(QFrame::Box | QFrame::Raised);
-    nextPieceLabel->setAlignment(Qt::AlignCenter);
-    board->setNextPieceLabel(nextPieceLabel);
+    //Creating the label which tells the player the next piece.
+    nextPiece = new QLabel;
+    nextPiece->setFrameStyle(QFrame::Box | QFrame::Raised);
+    nextPiece->setAlignment(Qt::AlignCenter);
+    gameBoard->setNextPieceLabel(nextPiece);
+
+    //Creating the label which tells the player what piece is being held.
+    holdPiece = new QLabel;
+    holdPiece->setFrameStyle(QFrame::Box | QFrame::Raised);
+    holdPiece->setAlignment(Qt::AlignCenter);
+    gameBoard->setHoldPieceLabel(holdPiece);
 
     //Reports the score to the player.
     score = new QLCDNumber(5);
@@ -21,44 +28,42 @@ TetrisGame::TetrisGame() {
     lines = new QLCDNumber(5);
     lines->setSegmentStyle(QLCDNumber::Filled);
 
-    //Buttons to start, quit, and pause the game.
-    startButton = new QPushButton(tr("&Start"));
-    startButton->setFocusPolicy(Qt::NoFocus);
-    quitButton = new QPushButton(tr("&Quit"));
-    quitButton->setFocusPolicy(Qt::NoFocus);
-    pauseButton = new QPushButton(tr("&Pause"));
-    pauseButton->setFocusPolicy(Qt::NoFocus);
+    //Buttons to start and pause the game.
+    start = new QPushButton(tr("&Start"));
+    start->setFocusPolicy(Qt::NoFocus);
+    pause = new QPushButton(tr("&Pause"));
+    pause->setFocusPolicy(Qt::NoFocus);
 
     //Connecting the buttons to the functions in the gameboard class.
-    connect(startButton, &QPushButton::clicked, board, &GameBoard::start);
-    connect(quitButton , &QPushButton::clicked, qApp, &QApplication::quit);
-    connect(pauseButton, &QPushButton::clicked, board, &GameBoard::pause);
+    connect(start, &QPushButton::clicked, gameBoard, &GameBoard::start);
+    connect(pause, &QPushButton::clicked, gameBoard, &GameBoard::pause);
 
     //Connecting the output of the gameboard to the displays.
-    connect(board, &GameBoard::scoreChanged,
+    connect(gameBoard, &GameBoard::scoreChanged,
             score, QOverload<int>::of(&QLCDNumber::display));
-    connect(board, &GameBoard::levelChanged,
+    connect(gameBoard, &GameBoard::levelChanged,
             level, QOverload<int>::of(&QLCDNumber::display));
-    connect(board, &GameBoard::linesRemovedChanged,
+    connect(gameBoard, &GameBoard::linesRemovedChanged,
             lines, QOverload<int>::of(&QLCDNumber::display));
 
     //Setting up the layout of the widget, by grid.
     QGridLayout *layout = new QGridLayout;
         layout->addWidget(createLabel(tr("NEXT")), 0, 0);
-        layout->addWidget(nextPieceLabel, 1, 0);
-        layout->addWidget(createLabel(tr("LEVEL")), 2, 0);
-        layout->addWidget(levelLcd, 3, 0);
-        layout->addWidget(startButton, 4, 0);
-        layout->addWidget(board, 0, 1, 6, 1);
+        layout->addWidget(nextPiece, 1, 0);
+        layout->addWidget(createLabel(tr("HOLD")));
+        layout->addWidget(holdPiece, 3, 0);
+        layout->addWidget(createLabel(tr("LEVEL")), 4, 0);
+        layout->addWidget(level, 5, 0);
+        layout->addWidget(start, 4, 2);
+        layout->addWidget(gameBoard, 0, 1, 6, 1);
         layout->addWidget(createLabel(tr("SCORE")), 0, 2);
-        layout->addWidget(scoreLcd, 1, 2);
+        layout->addWidget(score, 1, 2);
         layout->addWidget(createLabel(tr("LINES REMOVED")), 2, 2);
-        layout->addWidget(linesLcd, 3, 2);
-        layout->addWidget(quitButton, 4, 2);
-        layout->addWidget(pauseButton, 5, 2);
+        layout->addWidget(lines, 3, 2);
+        layout->addWidget(pause, 5, 2);
         setLayout(layout);
 
-        setWindowTitle(tr("Tetrix"));
+        setWindowTitle(tr("Tetris"));
         resize(550, 370);
 }
 
