@@ -7,6 +7,7 @@
 class QLCDNumber;
 class QLabel;
 class QPushButton;
+class QSlider;
 class GameBoard;
 
 class TetrisGame : public QWidget
@@ -30,6 +31,7 @@ private:
     QLCDNumber *lines;
     QPushButton *pause;
     QPushButton *start;
+    QSlider *difficulty;
 
 };
 

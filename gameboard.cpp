@@ -4,8 +4,8 @@
 GameBoard::GameBoard(QWidget *parent) : QFrame(parent) {
     setFrameStyle(QFrame::Panel | QFrame::Sunken);
     setFocusPolicy(Qt::StrongFocus);
-    isStarted = false;
-    isPaused = false;
+    Started = false;
+    Paused = false;
     clearBoard();
 
     nextPiece.setRandomShape();
@@ -30,31 +30,31 @@ QSize GameBoard::minimumSizeHint() const {
 }
 
 void GameBoard::start() {
-    if (isPaused)
+    if (Paused)
         return;
 
-    isStarted = true;
-    isWaitingAfterLine = false;
+    Started = true;
+    Waiting = false;
     numLinesRemoved = 0;
     numPiecesDropped = 0;
     score = 0;
     level = 1;
     clearBoard();
 
-    emit linesRemovedChanged(numLinesRemoved);
-    emit scoreChanged(score);
-    emit levelChanged(level);
+    emit linesRemovedChange(numLinesRemoved);
+    emit scoreChange(score);
+    emit levelChange(level);
 
     newPiece();
     timer.start(timeoutTime(), this);
 }
 
 void GameBoard::pause() {
-    if (!isStarted)
+    if (!Started)
         return;
 
-    isPaused = !isPaused;
-    if (isPaused) {
+    Paused = !Paused;
+    if (Paused) {
         timer.stop();
     } else {
         timer.start(timeoutTime(), this);
@@ -68,7 +68,7 @@ void GameBoard::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     QRect rect = contentsRect();
 
-    if (isPaused) {
+    if (Paused) {
         painter.drawText(rect, Qt::AlignCenter, tr("Pause"));
         return;
     }
@@ -83,34 +83,34 @@ void GameBoard::paintEvent(QPaintEvent *event) {
                            boardTop + i * squareHeight(), shape);
         }
     }
-    if (curPiece.shape() != NoShape) {
+    if (currentPiece.shape() != NoShape) {
         for (int i = 0; i < 4; ++i) {
-            int x = curX + curPiece.x(i);
-            int y = curY - curPiece.y(i);
+            int x = currentX + currentPiece.x(i);
+            int y = currentY - currentPiece.y(i);
             drawSquare(painter, rect.left() + x * squareWidth(),
                        boardTop + (BoardHeight - y - 1) * squareHeight(),
-                       curPiece.shape());
+                       currentPiece.shape());
         }
     }
 }
 
 void GameBoard::keyPressEvent(QKeyEvent *event) {
-    if (!isStarted || isPaused || curPiece.shape() == NoShape) {
+    if (!Started || Paused || currentPiece.shape() == NoShape) {
         QFrame::keyPressEvent(event);
         return;
     }
     switch (event->key()) {
     case Qt::Key_Left:
-        tryMove(curPiece, curX - 1, curY);
+        tryMove(currentPiece, currentX - 1, currentY);
         break;
     case Qt::Key_Right:
-        tryMove(curPiece, curX + 1, curY);
+        tryMove(currentPiece, currentX + 1, currentY);
         break;
     case Qt::Key_Down:
-        tryMove(curPiece.rotatedRight(), curX, curY);
+        tryMove(currentPiece.rotateRight(), currentX, currentY);
         break;
     case Qt::Key_Up:
-        tryMove(curPiece.rotatedLeft(), curX, curY);
+        tryMove(currentPiece.rotateLeft(), currentX, currentY);
         break;
     case Qt::Key_Space:
         dropDown();
@@ -131,8 +131,8 @@ void GameBoard::keyPressEvent(QKeyEvent *event) {
 
 void GameBoard::timerEvent(QTimerEvent *event) {
     if (event->timerId() == timer.timerId()) {
-        if (isWaitingAfterLine) {
-            isWaitingAfterLine = false;
+        if (Waiting) {
+            Waiting = false;
             newPiece();
             timer.start(timeoutTime(), this);
         } else {
@@ -150,9 +150,9 @@ void GameBoard::clearBoard() {
 
 void GameBoard::dropDown() {
     int dropHeight = 0;
-    int newY = curY;
+    int newY = currentY;
     while (newY > 0) {
-        if (!tryMove(curPiece, curX, newY - 1))
+        if (!tryMove(currentPiece, currentX, newY - 1))
             break;
         --newY;
         ++dropHeight;
@@ -161,29 +161,29 @@ void GameBoard::dropDown() {
 }
 
 void GameBoard::oneLineDown() {
-    if (!tryMove(curPiece, curX, curY - 1))
+    if (!tryMove(currentPiece, currentX, currentY - 1))
         pieceDropped(0);
 }
 
 void GameBoard::pieceDropped(int dropHeight) {
     for (int i = 0; i < 4; ++i) {
-        int x = curX + curPiece.x(i);
-        int y = curY - curPiece.y(i);
-        shapeAt(x, y) = curPiece.shape();
+        int x = currentX + currentPiece.x(i);
+        int y = currentY - currentPiece.y(i);
+        shapeAt(x, y) = currentPiece.shape();
     }
 
     ++numPiecesDropped;
     if (numPiecesDropped % 25 == 0) {
         ++level;
         timer.start(timeoutTime(), this);
-        emit levelChanged(level);
+        emit levelChange(level);
     }
 
     score += dropHeight + 7;
-    emit scoreChanged(score);
+    emit scoreChange(score);
     removeFullLines();
 
-    if (!isWaitingAfterLine)
+    if (!Waiting)
         newPiece();
 }
 
@@ -215,39 +215,39 @@ void GameBoard::removeFullLines() {
     if (numFullLines > 0) {
         numLinesRemoved += numFullLines;
         score += 10 * numFullLines;
-        emit linesRemovedChanged(numLinesRemoved);
-        emit scoreChanged(score);
+        emit linesRemovedChange(numLinesRemoved);
+        emit scoreChange(score);
 
         timer.start(500, this);
-        isWaitingAfterLine = true;
-        curPiece.setShape(NoShape);
+        Waiting = true;
+        currentPiece.setShape(NoShape);
         update();
     }
 
 }
 
 void GameBoard::newPiece() {
-    curPiece = nextPiece;
+    currentPiece = nextPiece;
     nextPiece.setRandomShape();
     showNextPiece();
-    curX = BoardWidth / 2 + 1;
-    curY = BoardHeight - 1 + curPiece.minY();
+    currentX = BoardWidth / 2 + 1;
+    currentY = BoardHeight - 1 + currentPiece.minY();
 
-    if (!tryMove(curPiece, curX, curY)) {
-        curPiece.setShape(NoShape);
+    if (!tryMove(currentPiece, currentX, currentY)) {
+        currentPiece.setShape(NoShape);
         timer.stop();
-        isStarted = false;
+        Started = false;
     }
 }
 
 void GameBoard::hold() {
     if (holdPiece.shape() == NoShape ) {
-        holdPiece = curPiece;
+        holdPiece = currentPiece;
         newPiece();
         showHoldPiece();
     } else {
-        Tetronimo dummy = curPiece;
-        curPiece = holdPiece;
+        Tetronimo dummy = currentPiece;
+        currentPiece = holdPiece;
         holdPiece = dummy;
         showHoldPiece();
     }
@@ -303,9 +303,9 @@ bool GameBoard::tryMove(const Tetronimo &newPiece, int newX, int newY) {
             return false;
     }
 
-    curPiece = newPiece;
-    curX = newX;
-    curY = newY;
+    currentPiece = newPiece;
+    currentX = newX;
+    currentY = newY;
     update();
     return true;
 }

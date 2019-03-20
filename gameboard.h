@@ -26,9 +26,9 @@ public slots:
     void pause();
 
 signals:
-    void scoreChanged(int score);
-    void levelChanged(int level);
-    void linesRemovedChanged(int numLines);
+    void scoreChange(int);
+    void levelChange(int);
+    void linesRemovedChange(int);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -57,20 +57,19 @@ private:
     QBasicTimer timer;
     QPointer<QLabel> nextPieceLabel;
     QPointer<QLabel> holdPieceLabel;
-    bool isStarted;
-    bool isPaused;
-    bool isWaitingAfterLine;
-    Tetronimo curPiece;
+    bool Started;
+    bool Paused;
+    bool Waiting;
+    Tetronimo currentPiece;
     Tetronimo nextPiece;
     Tetronimo holdPiece;
-    int curX;
-    int curY;
+    int currentX;
+    int currentY;
     int numLinesRemoved;
     int numPiecesDropped;
     int score;
     int level;
     TetronimoShape board[BoardWidth * BoardHeight];
 };
-//! [1]
 
 #endif // GAMEBOARD_H

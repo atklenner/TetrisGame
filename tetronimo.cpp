@@ -6,6 +6,43 @@ Tetronimo::Tetronimo() {
     setShape(NoShape);
 }
 
+int Tetronimo::x(int index) const {
+    return coordinates[index][0];
+}
+
+int Tetronimo::y(int index) const {
+    return coordinates[index][1];
+}
+
+int Tetronimo::minX() const {
+    int min = coordinates[0][0];
+    for (int i = 1; i < 4; ++i)
+        min = qMin(min, coordinates[i][0]);
+    return min;
+
+}
+
+int Tetronimo::maxX() const {
+    int max = coordinates[0][0];
+    for (int i = 1; i < 4; ++i)
+        max = qMax(max, coordinates[i][0]);
+    return max;
+}
+
+int Tetronimo::minY() const {
+    int min = coordinates[0][1];
+    for (int i = 1; i < 4; ++i)
+        min = qMin(min, coordinates[i][1]);
+    return min;
+}
+
+int Tetronimo::maxY() const {
+    int max = coordinates[0][1];
+    for (int i = 1; i < 4; ++i)
+        max = qMax(max, coordinates[i][1]);
+    return max;
+}
+
 //Sets the piece to a random shape using a random number generator.
 void Tetronimo::setRandomShape() {
     setShape(TetronimoShape(QRandomGenerator::global()->bounded(7) + 1));
@@ -29,7 +66,7 @@ void Tetronimo::setShape(TetronimoShape shape) {
 
     for (int i = 0; i < 4 ; i++) {
         for (int j = 0; j < 2; ++j)
-            coords[i][j] = coordsTable[shape][i][j];
+            coordinates[i][j] = coordsTable[shape][i][j];
     }
     pieceShape = shape;
 }
@@ -39,44 +76,9 @@ TetronimoShape Tetronimo::shape() const {
     return pieceShape;
 }
 
-int Tetronimo::x(int index) const {
-    return coords[index][0];
-}
 
-int Tetronimo::y(int index) const {
-    return coords[index][1];
-}
 
-int Tetronimo::minX() const {
-    int min = coords[0][0];
-    for (int i = 1; i < 4; ++i)
-        min = qMin(min, coords[i][0]);
-    return min;
-
-}
-
-int Tetronimo::maxX() const {
-    int max = coords[0][0];
-    for (int i = 1; i < 4; ++i)
-        max = qMax(max, coords[i][0]);
-    return max;
-}
-
-int Tetronimo::minY() const {
-    int min = coords[0][1];
-    for (int i = 1; i < 4; ++i)
-        min = qMin(min, coords[i][1]);
-    return min;
-}
-
-int Tetronimo::maxY() const {
-    int max = coords[0][1];
-    for (int i = 1; i < 4; ++i)
-        max = qMax(max, coords[i][1]);
-    return max;
-}
-
-Tetronimo Tetronimo::rotatedLeft() const {
+Tetronimo Tetronimo::rotateLeft() const {
     if (pieceShape == OShape)
         return *this;
 
@@ -89,7 +91,7 @@ Tetronimo Tetronimo::rotatedLeft() const {
     return result;
 }
 
-Tetronimo Tetronimo::rotatedRight() const {
+Tetronimo Tetronimo::rotateRight() const {
     if (pieceShape == OShape)
         return *this;
 
@@ -103,9 +105,9 @@ Tetronimo Tetronimo::rotatedRight() const {
 }
 
 void Tetronimo::setX(int index, int x) {
-    coords[index][0] = x;
+    coordinates[index][0] = x;
 }
 
 void Tetronimo::setY(int index, int y) {
-    coords[index][1] = y;
+    coordinates[index][1] = y;
 }

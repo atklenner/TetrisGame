@@ -28,6 +28,11 @@ TetrisGame::TetrisGame() {
     lines = new QLCDNumber(5);
     lines->setSegmentStyle(QLCDNumber::Filled);
 
+    //Creating difficulty slider.
+    difficulty = new QSlider(Qt::Horizontal);
+    difficulty->setFocusPolicy(Qt::NoFocus);
+    difficulty->setTickInterval(1);
+
     //Buttons to start and pause the game.
     start = new QPushButton(tr("&Start"));
     start->setFocusPolicy(Qt::NoFocus);
@@ -37,13 +42,14 @@ TetrisGame::TetrisGame() {
     //Connecting the buttons to the functions in the gameboard class.
     connect(start, &QPushButton::clicked, gameBoard, &GameBoard::start);
     connect(pause, &QPushButton::clicked, gameBoard, &GameBoard::pause);
+//Need to connect difficulty slider to game board and make that modify both the speed and the score earned by the player.
 
     //Connecting the output of the gameboard to the displays.
-    connect(gameBoard, &GameBoard::scoreChanged,
+    connect(gameBoard, &GameBoard::scoreChange,
             score, QOverload<int>::of(&QLCDNumber::display));
-    connect(gameBoard, &GameBoard::levelChanged,
+    connect(gameBoard, &GameBoard::levelChange,
             level, QOverload<int>::of(&QLCDNumber::display));
-    connect(gameBoard, &GameBoard::linesRemovedChanged,
+    connect(gameBoard, &GameBoard::linesRemovedChange,
             lines, QOverload<int>::of(&QLCDNumber::display));
 
     //Setting up the layout of the widget, by grid.
@@ -61,6 +67,8 @@ TetrisGame::TetrisGame() {
         layout->addWidget(createLabel(tr("LINES REMOVED")), 2, 2);
         layout->addWidget(lines, 3, 2);
         layout->addWidget(pause, 5, 2);
+        layout->addWidget(createLabel(tr("DIFFICULTY")), 6, 1);
+        layout->addWidget(difficulty, 7, 0, 7, 3);
         setLayout(layout);
 
         setWindowTitle(tr("Tetris"));

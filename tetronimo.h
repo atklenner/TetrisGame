@@ -12,6 +12,16 @@ public:
     //Constructs tetris piece.
     Tetronimo();
 
+    //Returns the x or y coordinate at a given index.
+    int x(int) const;
+    int y(int) const;
+
+    //Returns the max or min x/y coordinate for all indeces.
+    int minX() const;
+    int maxX() const;
+    int minY() const;
+    int maxY() const;
+
     //Sets the piece to a random shape.
     void setRandomShape();
 
@@ -21,22 +31,17 @@ public:
     //Returns the shape of the piece.
     TetronimoShape shape() const;
 
-    //
-    int x(int index) const;
-    int y(int index) const;
-    int minX() const;
-    int maxX() const;
-    int minY() const;
-    int maxY() const;
-    Tetronimo rotatedLeft() const;
-    Tetronimo rotatedRight() const;
+    //Rotates the tetronimo by multiplying by a translation matrix.
+    Tetronimo rotateLeft() const;
+    Tetronimo rotateRight() const;
 
 private:
-    void setX(int index, int x);
-    void setY(int index, int y);
+    //Sets the x or y coordinate
+    void setX(int, int);
+    void setY(int, int);
 
     TetronimoShape pieceShape;
-    int coords[4][2];
+    int coordinates[4][2];
 };
 
 #endif // TETRONIMO_H
