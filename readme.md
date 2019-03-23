@@ -18,11 +18,14 @@ commit message is empty when it is not. I had to find the solution
 on stackexchange and use git commit -am "message".
 (This is not finished, I have to say how following the tutorial went)
 
-(I want to explain the process of getting the game running/reading the tutorial (and how ealy/hard this was),
-the the motivation for all my modifications, and how those work/how difficult 
-were they to implement)
+(I want to explain the process of getting the game running/reading the tutorial (and how easy/hard this was),
+the the motivation for all my modifications, and how those work/how difficult were they to implement)
 
 ### The Modifications
+
+I decided that the game I ended up with following the tutorial isn't as
+fully featured as I could make it so I modified it a bit, some of these
+were fairly easy to implement, some not so much.
 
 The first mod I made was to include a hold piece function. I've seen this
 in other tetris games and wanted it in mine. It lets you press the "h" key
@@ -35,15 +38,25 @@ Next I removed the quit button, this was obviously just deleting code, but
 I didn't see a need for two exit buttons so I got rid of it.
 
 Then I made the pause a little easier to access by making it a keyboard
-shortcut as well as a button in the window. This wasn't too easy to 
-implement as it required rethinking the way the program would ignore
-key presses when it was paused. (This is unfinished still)
+shortcut as well as a button in the window. This took a bit of thinking
+to implement. It was easy to make it pause when the game was playing but
+un-pausing the game when it was paused was hard. Though looking back the 
+solution is pretty straight foreward, all I did was add an if and switch
+statement to the function that handled the keyboard input.
 
-(difficulty slider, modifies the speed and the score)
+I wanted to add a difficulty slider to the game. This would increase the
+speed of the game while also increasing the number of points you would
+earn whenever you completed a line or dropped a piece early. This required
+writing a new slot and signal to the window and gameboard respectively and
+adding an int to multiply the score increases and decrease the amound of
+time in between when the game updates itself.
 
 (changing colors of the window and other things)
 
-(directions on screen before you start the game)
+I added directions to the game. Before you start the game the directions
+are presented to the player and they disappear when you start the game. 
+This was easy to implement, all I had to do was add text to the QFrame
+that would only show before the game had started.
 
 (redo ui elements, i.e. use Qt designer)
 

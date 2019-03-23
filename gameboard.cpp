@@ -39,6 +39,7 @@ void GameBoard::start() {
     numPiecesDropped = 0;
     score = 0;
     level = 1;
+    difficultyMod = 0;
     clearBoard();
 
     emit linesRemovedChange(numLinesRemoved);
@@ -62,6 +63,11 @@ void GameBoard::pause() {
     update();
 }
 
+void GameBoard::difficulty(int diff) {
+    difficultyMod = diff;
+    timer.start(timeoutTime(), this);
+}
+
 void GameBoard::paintEvent(QPaintEvent *event) {
     QFrame::paintEvent(event);
 
@@ -69,8 +75,16 @@ void GameBoard::paintEvent(QPaintEvent *event) {
     QRect rect = contentsRect();
 
     if (Paused) {
-        painter.drawText(rect, Qt::AlignCenter, tr("Pause"));
+        painter.drawText(rect, Qt::AlignCenter, tr("Paused\nPress P to resume."));
         return;
+    }
+
+    //Adding the directions, they will only show up before you hit the start button.
+    if(currentPiece.shape() == NoShape && !Started) {
+        painter.drawText(rect, Qt::AlignCenter, tr("Controls\n\nLeft & Right: move piece\n"
+                                                   "Up & Down: rotate piece\nSpace Bar: drop"
+                                                   " piece\nD: drop piece one line\nP: pause"
+                                                   " game\nH: hold current piece"));
     }
 
     int boardTop = rect.bottom() - BoardHeight*squareHeight();
@@ -96,6 +110,18 @@ void GameBoard::paintEvent(QPaintEvent *event) {
 
 void GameBoard::keyPressEvent(QKeyEvent *event) {
     if (!Started || Paused || currentPiece.shape() == NoShape) {
+        //I added this. If you don't ask if the game is paused then you could
+        //pause the game before it has actually started, this results in
+        //undefined behavior.
+        if(Paused) {
+            switch(event->key()) {
+            case Qt::Key_P:
+                pause();
+                break;
+            default:
+                QFrame::keyPressEvent(event);
+            }
+        }
         QFrame::keyPressEvent(event);
         return;
     }
@@ -121,6 +147,7 @@ void GameBoard::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_H:
         hold();
         break;
+    //I added this so you can pause while playing by pressing the p key.
     case Qt::Key_P:
         pause();
         break;
@@ -179,7 +206,7 @@ void GameBoard::pieceDropped(int dropHeight) {
         emit levelChange(level);
     }
 
-    score += dropHeight + 7;
+    score += (dropHeight + 7) * (difficultyMod + 1);
     emit scoreChange(score);
     removeFullLines();
 
@@ -214,11 +241,14 @@ void GameBoard::removeFullLines() {
 
     if (numFullLines > 0) {
         numLinesRemoved += numFullLines;
-        score += 10 * numFullLines;
+        score += 10 * numFullLines * (difficultyMod + 1);
         emit linesRemovedChange(numLinesRemoved);
         emit scoreChange(score);
-
+        if (numFullLines == 4) {
+            emit gotTetris("Tetris!");
+        }
         timer.start(500, this);
+        emit gotTetris("");
         Waiting = true;
         currentPiece.setShape(NoShape);
         update();

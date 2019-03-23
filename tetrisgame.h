@@ -26,6 +26,7 @@ private:
     GameBoard *gameBoard;
     QLabel *nextPiece;
     QLabel *holdPiece;
+    QLabel *tetris;
     QLCDNumber *score;
     QLCDNumber *level;
     QLCDNumber *lines;

@@ -24,11 +24,13 @@ public:
 public slots:
     void start();
     void pause();
+    void difficulty(int);
 
 signals:
     void scoreChange(int);
     void levelChange(int);
     void linesRemovedChange(int);
+    void gotTetris(std::string);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -39,7 +41,7 @@ private:
     enum { BoardWidth = 10, BoardHeight = 22 };
 
     TetronimoShape &shapeAt(int x, int y) { return board[(y * BoardWidth) + x]; }
-    int timeoutTime() { return 1000 / (1 + level); }
+    int timeoutTime() { return 1000 / (1 + level + difficultyMod); }
     int squareWidth() { return contentsRect().width() / BoardWidth; }
     int squareHeight() { return contentsRect().height() / BoardHeight; }
     void clearBoard();
@@ -69,7 +71,8 @@ private:
     int numPiecesDropped;
     int score;
     int level;
+    int difficultyMod;
     TetronimoShape board[BoardWidth * BoardHeight];
 };
 
-#endif // GAMEBOARD_H
+#endif
