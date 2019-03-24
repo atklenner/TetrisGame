@@ -10,29 +10,20 @@ class QPushButton;
 class QSlider;
 class GameBoard;
 
+namespace Ui {
+class Form;
+}
+
 class TetrisGame : public QWidget
 {
     Q_OBJECT
 
 public:
     TetrisGame();
+    ~TetrisGame();
 
 private:
-
-    //Function used to make creating labels easier.
-    QLabel *createLabel(const QString &text);
-
-    //All the elements in the window except the labels.
-    GameBoard *gameBoard;
-    QLabel *nextPiece;
-    QLabel *holdPiece;
-    QLabel *tetris;
-    QLCDNumber *score;
-    QLCDNumber *level;
-    QLCDNumber *lines;
-    QPushButton *pause;
-    QPushButton *start;
-    QSlider *difficulty;
+    Ui::Form *ui;
 
 };
 

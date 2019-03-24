@@ -65,7 +65,9 @@ void GameBoard::pause() {
 
 void GameBoard::difficulty(int diff) {
     difficultyMod = diff;
-    timer.start(timeoutTime(), this);
+    if (Started) {
+        timer.start(timeoutTime(), this);
+    }
 }
 
 void GameBoard::paintEvent(QPaintEvent *event) {

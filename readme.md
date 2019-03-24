@@ -59,5 +59,6 @@ This was easy to implement, all I had to do was add text to the QFrame
 that would only show before the game had started.
 
 (redo ui elements, i.e. use Qt designer)
+This is easily the most difficult modification I made. 
 
 (tetris special effect, when you get a tetris it looks cool)

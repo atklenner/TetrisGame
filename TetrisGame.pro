@@ -35,7 +35,8 @@ HEADERS += \
     tetronimo.h \
     gameboard.h
 
-FORMS +=
+FORMS += \
+    tetrisgame.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
