@@ -14,23 +14,31 @@ class GameBoard : public QFrame
     Q_OBJECT
 
 public:
+
     GameBoard(QWidget *parent = 0);
 
+    //Set the labels on the widget depending on what piece is next and what
+    //is stored in holdPiece.
     void setNextPieceLabel(QLabel *label);
     void setHoldPieceLabel(QLabel *label);
-    QSize sizeHint() const override;
-    QSize minimumSizeHint() const override;
 
 public slots:
+
+    //Starts the game when the start button is pressed in the widget.
     void start();
+
+    //Pauses the game when the button is pressed or the P key is pressed.
     void pause();
+
+    //Modifies the difficulty by speeding up the game by and integer value,
+    //this is affected by a horizontal slider in the widget.
     void difficulty(int);
 
 signals:
     void scoreChange(int);
     void levelChange(int);
     void linesRemovedChange(int);
-    void gotTetris(std::string);
+    void gotTetris(QString);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

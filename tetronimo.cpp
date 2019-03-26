@@ -1,7 +1,6 @@
 #include "tetronimo.h"
 #include <QtCore>
 
-//Constructor for a tetris piece, sets it to a default non-piece.
 Tetronimo::Tetronimo() {
     setShape(NoShape);
 }
@@ -16,30 +15,34 @@ int Tetronimo::y(int index) const {
 
 int Tetronimo::minX() const {
     int min = coordinates[0][0];
-    for (int i = 1; i < 4; ++i)
+    for (int i = 1; i < 4; ++i) {
         min = qMin(min, coordinates[i][0]);
+    }
     return min;
 
 }
 
 int Tetronimo::maxX() const {
     int max = coordinates[0][0];
-    for (int i = 1; i < 4; ++i)
+    for (int i = 1; i < 4; ++i) {
         max = qMax(max, coordinates[i][0]);
+    }
     return max;
 }
 
 int Tetronimo::minY() const {
     int min = coordinates[0][1];
-    for (int i = 1; i < 4; ++i)
+    for (int i = 1; i < 4; ++i) {
         min = qMin(min, coordinates[i][1]);
+    }
     return min;
 }
 
 int Tetronimo::maxY() const {
     int max = coordinates[0][1];
-    for (int i = 1; i < 4; ++i)
+    for (int i = 1; i < 4; ++i) {
         max = qMax(max, coordinates[i][1]);
+    }
     return max;
 }
 
@@ -53,6 +56,7 @@ void Tetronimo::setRandomShape() {
 //four blocks that make up a tetronimo. The (0,0) is the block which the
 //piece rotates around.
 void Tetronimo::setShape(TetronimoShape shape) {
+    //The lookup table
     static const int coordsTable[8][4][2] = {
         { { 0, 0 },   { 0, 0 },   { 0, 0 },   { 0, 0 } },
         { { 0, -1 },  { 0, 0 },   { -1, 0 },  { -1, 1 } },
@@ -63,21 +67,22 @@ void Tetronimo::setShape(TetronimoShape shape) {
         { { -1, -1 }, { 0, -1 },  { 0, 0 },   { 0, 1 } },
         { { 1, -1 },  { 0, -1 },  { 0, 0 },   { 0, 1 } }
     };
-
+    //This sets the coordinates, first it sets the x, then the y.
+    //The x is the first number in the tuple in the lookup table, y is the second.
     for (int i = 0; i < 4 ; i++) {
-        for (int j = 0; j < 2; ++j)
+        for (int j = 0; j < 2; ++j) {
             coordinates[i][j] = coordsTable[shape][i][j];
+        }
     }
     pieceShape = shape;
 }
 
-//Simply returns the shape.
 TetronimoShape Tetronimo::shape() const {
     return pieceShape;
 }
 
-
-
+//Returns a rotated piece that still has the same shape but not the same
+//coordinates. The coordinates are rotated 90 degrees counter-clockwise.
 Tetronimo Tetronimo::rotateLeft() const {
     if (pieceShape == OShape)
         return *this;
@@ -91,6 +96,7 @@ Tetronimo Tetronimo::rotateLeft() const {
     return result;
 }
 
+//Same as the last but now its clockwise 90 degrees.
 Tetronimo Tetronimo::rotateRight() const {
     if (pieceShape == OShape)
         return *this;

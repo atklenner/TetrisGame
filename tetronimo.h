@@ -9,6 +9,7 @@ enum TetronimoShape { NoShape, ZShape, SShape, IShape, TShape, OShape,
 class Tetronimo
 {
 public:
+
     //Constructs tetris piece.
     Tetronimo();
 
@@ -26,21 +27,26 @@ public:
     void setRandomShape();
 
     //Sets piece to a specific shape.
-    void setShape(TetronimoShape shape);
+    void setShape(TetronimoShape);
 
     //Returns the shape of the piece.
     TetronimoShape shape() const;
 
-    //Rotates the tetronimo by multiplying by a translation matrix.
+    //Rotates the tetronimo by multiplying by a rotation matrix.
     Tetronimo rotateLeft() const;
     Tetronimo rotateRight() const;
 
 private:
-    //Sets the x or y coordinate
+
+    //Sets the x or y coordinate.
     void setX(int, int);
     void setY(int, int);
 
+    //Stores the descriptive name of the shape.
     TetronimoShape pieceShape;
+
+    //This two dimensional array stores where the four blocks of every
+    //tetronimo are placed, based on the pieceShape.
     int coordinates[4][2];
 };
 

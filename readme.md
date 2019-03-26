@@ -4,9 +4,8 @@
 
 I chose tetris because making games seems like a fun thing to do and
 I never really got around to actually doing it. There were other project
-ideas that I had that would have been more technical but with my other
-obligations (Math 110B and 120A) I decided to take a simpler route and
-use Qt.
+ideas that I had that would have been more technical but with other 
+obligations I decided to start a little simpler.
 
 Much of this project was following the tutorial [here](https://doc.qt.io/qt-5/qtwidgets-widgets-tetrix-example.html).
 Though the first thing I did was finally get around to completing 
@@ -19,7 +18,7 @@ on stackexchange and use git commit -am "message".
 (This is not finished, I have to say how following the tutorial went)
 
 (I want to explain the process of getting the game running/reading the tutorial (and how easy/hard this was),
-the the motivation for all my modifications, and how those work/how difficult were they to implement)
+the motivation for all my modifications, and how those work/how difficult were they to implement)
 
 ### The Modifications
 
@@ -51,14 +50,24 @@ writing a new slot and signal to the window and gameboard respectively and
 adding an int to multiply the score increases and decrease the amound of
 time in between when the game updates itself.
 
-(changing colors of the window and other things)
-
 I added directions to the game. Before you start the game the directions
 are presented to the player and they disappear when you start the game. 
 This was easy to implement, all I had to do was add text to the QFrame
 that would only show before the game had started.
 
-(redo ui elements, i.e. use Qt designer)
-This is easily the most difficult modification I made. 
+The next modification I made was to rewrite the ui part of the game and
+use Qt Designer. This is easily the most difficult modification I made. 
+Though the most difficult part was figuring out why I couldn't add a ui
+object to my game class. Eventually I figured out that the ui form was
+creating a class of a different name and so of course the solution was
+incredibly simple, which was just change the name of the ui class to
+Ui::Form. After that had been resolved I just recreated the ui using 
+Qt Designer and deleted a bunch of code that was redundant. The last
+thing I added to the ui was the GameBoard, which is the class that 
+the actual game happens in. This required me to add a QFrame and then
+promote it to a GameBoard widget, after that it worked perfectly.
 
-(tetris special effect, when you get a tetris it looks cool)
+The last thing I did was make it so that when you got a tetris, that is,
+complete four lines at once, the game would congratulate you and say
+TETRIS! This was simple and all I did was add a QLabel and a new signal
+that would be triggered when you completed four lines.

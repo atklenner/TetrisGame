@@ -3,7 +3,6 @@
 
 GameBoard::GameBoard(QWidget *parent) : QFrame(parent) {
     setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    setFocusPolicy(Qt::StrongFocus);
     Started = false;
     Paused = false;
     clearBoard();
@@ -19,19 +18,10 @@ void GameBoard::setHoldPieceLabel(QLabel *label) {
     holdPieceLabel = label;
 }
 
-QSize GameBoard::sizeHint() const {
-    return QSize(BoardWidth * 15 + frameWidth() * 2,
-                 BoardHeight * 15 + frameWidth() * 2);
-}
-
-QSize GameBoard::minimumSizeHint() const {
-    return QSize(BoardWidth * 5 + frameWidth() * 2,
-                 BoardHeight * 5 + frameWidth() * 2);
-}
-
 void GameBoard::start() {
-    if (Paused)
+    if (Paused) {
         return;
+    }
 
     Started = true;
     Waiting = false;
@@ -51,8 +41,9 @@ void GameBoard::start() {
 }
 
 void GameBoard::pause() {
-    if (!Started)
+    if (!Started) {
         return;
+    }
 
     Paused = !Paused;
     if (Paused) {
@@ -94,9 +85,10 @@ void GameBoard::paintEvent(QPaintEvent *event) {
     for (int i = 0; i < BoardHeight; ++i) {
         for (int j = 0; j < BoardWidth; ++j) {
             TetronimoShape shape = shapeAt(j, BoardHeight - i - 1);
-            if (shape != NoShape)
+            if (shape != NoShape) {
                 drawSquare(painter, rect.left() + j * squareWidth(),
                            boardTop + i * squareHeight(), shape);
+            }
         }
     }
     if (currentPiece.shape() != NoShape) {
@@ -112,9 +104,6 @@ void GameBoard::paintEvent(QPaintEvent *event) {
 
 void GameBoard::keyPressEvent(QKeyEvent *event) {
     if (!Started || Paused || currentPiece.shape() == NoShape) {
-        //I added this. If you don't ask if the game is paused then you could
-        //pause the game before it has actually started, this results in
-        //undefined behavior.
         if(Paused) {
             switch(event->key()) {
             case Qt::Key_P:
@@ -149,7 +138,6 @@ void GameBoard::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_H:
         hold();
         break;
-    //I added this so you can pause while playing by pressing the p key.
     case Qt::Key_P:
         pause();
         break;
@@ -173,8 +161,9 @@ void GameBoard::timerEvent(QTimerEvent *event) {
 }
 
 void GameBoard::clearBoard() {
-    for (int i = 0; i < BoardHeight * BoardWidth; ++i)
+    for (int i = 0; i < BoardHeight * BoardWidth; ++i) {
         board[i] = NoShape;
+    }
 }
 
 void GameBoard::dropDown() {
@@ -190,8 +179,9 @@ void GameBoard::dropDown() {
 }
 
 void GameBoard::oneLineDown() {
-    if (!tryMove(currentPiece, currentX, currentY - 1))
+    if (!tryMove(currentPiece, currentX, currentY - 1)) {
         pieceDropped(0);
+    }
 }
 
 void GameBoard::pieceDropped(int dropHeight) {
@@ -212,8 +202,9 @@ void GameBoard::pieceDropped(int dropHeight) {
     emit scoreChange(score);
     removeFullLines();
 
-    if (!Waiting)
+    if (!Waiting) {
         newPiece();
+    }
 }
 
 void GameBoard::removeFullLines() {
@@ -232,11 +223,13 @@ void GameBoard::removeFullLines() {
         if (lineIsFull) {
             ++numFullLines;
             for (int k = i; k < BoardHeight - 1; ++k) {
-                for (int j = 0; j < BoardWidth; ++j)
+                for (int j = 0; j < BoardWidth; ++j) {
                     shapeAt(j, k) = shapeAt(j, k + 1);
+                }
             }
-            for (int j = 0; j < BoardWidth; ++j)
+            for (int j = 0; j < BoardWidth; ++j) {
                 shapeAt(j, BoardHeight - 1) = NoShape;
+            }
         }
 
     }
@@ -247,10 +240,9 @@ void GameBoard::removeFullLines() {
         emit linesRemovedChange(numLinesRemoved);
         emit scoreChange(score);
         if (numFullLines == 4) {
-            emit gotTetris("Tetris!");
+            emit gotTetris("TETRIS!");
         }
         timer.start(500, this);
-        emit gotTetris("");
         Waiting = true;
         currentPiece.setShape(NoShape);
         update();
@@ -286,8 +278,9 @@ void GameBoard::hold() {
 }
 
 void GameBoard::showNextPiece() {
-    if (!nextPieceLabel)
+    if (!nextPieceLabel) {
         return;
+    }
 
     int dx = nextPiece.maxX() - nextPiece.minX() + 1;
     int dy = nextPiece.maxY() - nextPiece.minY() + 1;
@@ -306,8 +299,9 @@ void GameBoard::showNextPiece() {
 }
 
 void GameBoard::showHoldPiece() {
-    if (!holdPieceLabel)
+    if (!holdPieceLabel) {
         return;
+    }
 
     int dx = holdPiece.maxX() - holdPiece.minX() + 1;
     int dy = holdPiece.maxY() - holdPiece.minY() + 1;
@@ -329,10 +323,12 @@ bool GameBoard::tryMove(const Tetronimo &newPiece, int newX, int newY) {
     for (int i = 0; i < 4; ++i) {
         int x = newX + newPiece.x(i);
         int y = newY - newPiece.y(i);
-        if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight)
+        if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) {
             return false;
-        if (shapeAt(x, y) != NoShape)
+        }
+        if (shapeAt(x, y) != NoShape) {
             return false;
+        }
     }
 
     currentPiece = newPiece;
